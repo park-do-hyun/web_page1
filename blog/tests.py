@@ -17,25 +17,25 @@ class TestView(TestCase):
     # 1.4 내비게이션 바가 있다.
     navbar = soup.nav
     # 1.5 blog, About me라는 문구가 내비게이션 바에 있다.
-    self.assertIn('Blog', navbar.text)
-    self.assertIn('About Me', navbar.text)
+    self.assertIn('blog', navbar.text)
+    self.assertIn('About me', navbar.text)
 
     # 2.1 메인 영역에 게시물이 하나도 없다면
-    self.assertEqual(Post,object.count(), 0)
+    self.assertEqual(Post.objects.count(), 0)
     # 2.2 '아직 게시물이 없습니다.'라는 문구가 보인다.
     main_area = soup.find('div', id='main-area')
     self.assertIn('아직 게시물이 없습니다', main_area.text)
 
     # 3.1 게시물이 2개 있다면
-    post_001 = Post.object.create(
+    post_001 = Post.objects.create(
       title='첫 번째 포스트입니다.',
       content='Hello World. We are the world.',
     )
-    post_001 = Post.object.create(
-      title='두 번째 포스트입니다..',
+    post_002 = Post.objects.create(
+      title='두 번째 포스트입니다.',
       content='1등이 전부는 아니잖아요?',
     )
-    self.assertEqual(Post.object.count(), 2)
+    self.assertEqual(Post.objects.count(), 2)
 
     # 3.2 포스트 목록 페이지를 새로고침했을 때
     response = self.client.get('/blog/')
@@ -78,7 +78,6 @@ class TestView(TestCase):
 
       # 2.5. 첫 번째 포스트의 작성자(author)가 포스트 영역에 있다.(아직 구현할 수 없음)
       #아직 작성 불가
-      
       # 2.6. 첫 번째 포스트의 내용(content)이 포스트 영역에 있다.
       self.assertIn(post_001.content, post_area.text)
 
