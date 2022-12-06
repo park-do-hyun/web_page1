@@ -54,7 +54,7 @@ class PostCreate(LoginRequiredMixin,UserPassesTestMixin, CreateView):
                         tag.save()
                     self.object.tags.add(tag)
             return response
-            
+
         else:
             return redirect('/blog/')
 
@@ -63,6 +63,16 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
     fields = ['title', 'hook_text', 'content', ' head_image', 'file_upload', 'category', 'tags']
 
     template_name = 'blog/post_update_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PostUpdate, self).get_context_data()
+        if self.object.tags.exists():
+            tags_str_list = list()
+            for t in self.object.tags.all():
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = ';'.join(tags_str_list)
+
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and request.user == self.get_object().author:
