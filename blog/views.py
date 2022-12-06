@@ -26,9 +26,9 @@ class PostDetail(DetailView) :
         context['no_category_post_count'] = Post.objects.filter(Category=None).count
         return context
 
-class PostCreate(LoginRequiredMixin,UserPassesTestMixin, CreateView):
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Post
-    fields = ['title', 'hook_text', ' content', 'head_image', 'file_upload', 'category']
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
     def test_func(self):
         return self.request.user.is_superuser or self.request.user.is_staff
@@ -43,24 +43,25 @@ class PostCreate(LoginRequiredMixin,UserPassesTestMixin, CreateView):
             if tags_str:
                 tags_str = tags_str.strip()
 
-                tags_str = tags_str.replace(',',';')
+                tags_str = tags_str.replace(',', ';')
                 tags_list = tags_str.split(';')
 
                 for t in tags_list:
                     t = t.strip()
                     tag, is_tag_created = Tag.objects.get_or_create(name=t)
                     if is_tag_created:
-                        tag_slug = slugify(t, allow_unicode=True)
+                        tag.slug = slugify(t, allow_unicode=True)
                         tag.save()
                     self.object.tags.add(tag)
+
             return response
 
         else:
-            return redirect('/blog/')
+                return redirect('/blog/')
 
 class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
-    fields = ['title', 'hook_text', 'content', ' head_image', 'file_upload', 'category', 'tags']
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
     template_name = 'blog/post_update_form.html'
 
@@ -70,7 +71,7 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
             tags_str_list = list()
             for t in self.object.tags.all():
                 tags_str_list.append(t.name)
-            context['tags_str_default'] = ';'.join(tags_str_list)
+            context['tags_str_default'] = '; '.join(tags_str_list)
 
         return context
 
@@ -80,16 +81,27 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
         else:
             raise PermissionDenied
 
-def single_post_page(request, pk):
-    post = Post.objects.get(pk=pk)
+    def form_valid(self, form):
+        response = super(PostUpdate, self).form_valid(form)
+        self.object.tags.clear()
 
-    return render(
-        request,
-        'blog/single_post_page.html',
-        {
-            'post' : post,
-        }
-    )
+        tags_str = self.request.POST.get('tags_str')
+        if tags_str:
+            tags_str = tags_str.strip()
+            tags_str = tags_str.replace(',', ';')
+            tags_list = tags_str.split(';')
+
+            for t in tags_list:
+                t = t.strip()
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                if is_tag_created:
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+                self.object.tags.add(tag)
+
+        return response
+
+
 
 def category_page(request, slug):
     if slug == 'no_category':
@@ -105,22 +117,22 @@ def category_page(request, slug):
         {
             'post_list': post_list,
             'categories': Category.objects.all(),
-            'no_category_post_count': Post.object.filter(category=None).count(),
+            'no_category_post_count': Post.objects.filter(category=None).count(),
             'category': category,
         }
     )
 
 def tag_page(request, slug):
     tag = Tag.objects.get(slug=slug)
-    post_list = tag_page_set.all()
+    post_list = tag.post_set.all()
 
     return render(
         request,
         'blog/post_list.html',
         {
-            'post_list' : post_list,
-            'tag' : tag,
-            'categories' : Category.objects.all(),
-            'no_category_post_count' : Post.objects.filter(Category=None).count(),
+            'post_list': post_list,
+            'tag': tag,
+            'categories': Category.objects.all(),
+            'no_category_post_count': Post.objects.filter(category=None).count(),
         }
     )
