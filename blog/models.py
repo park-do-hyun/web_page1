@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from markdownx.models import MarkdownxField
 from markdown import markdown
-
 import os
 
 class Tag(models.Model):
@@ -42,7 +41,7 @@ class Post(models.Model) :
 
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
-    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+    Category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
 
     tags = models.ManyToManyField(Tag, blank=True)
 
@@ -62,11 +61,11 @@ class Post(models.Model) :
         return markdown(self.content)
 
 class Comment(models.Model):
-    post        = models.ForeignKey(Post, on_delete=models.CASCADE)
-    author      = models.ForeignKey(User, on_delete=models.CASCADE)
-    content     = models.TextField()
-    created_at  = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
+    post= models.ForeignKey(Post, on_delete=models.CASCADE)
+    author= models.ForeignKey(User, on_delete=models.CASCADE)
+    content= models.TextField()
+    created_at= models.DateTimeField(auto_now_add=True)
+    modified_at= models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.author}::{self.content}'

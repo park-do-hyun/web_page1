@@ -14,8 +14,8 @@ class TestView(TestCase) :
         self.user_obama.save()
 
         # 카테고리
-        self.category_programming = Category.objects.create(name='programming', slug='programming')
-        self.category_music = Category.objects.create(name='music', slug='music')
+        self.Category_programming = Category.objects.create(name='programming', slug='programming')
+        self.Category_music = Category.objects.create(name='music', slug='music')
 
         # 태그
         self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
@@ -25,7 +25,7 @@ class TestView(TestCase) :
         self.post_001 = Post.objects.create(
             title = '첫 번째 포스트입니다.',
             content = 'Hello World. We are the world',
-            category = self.category_programming,
+            Category = self.Category_programming,
             author = self.user_trump,
         )
         self.post_001.tags.add(self.tag_hello)
@@ -33,7 +33,7 @@ class TestView(TestCase) :
         self.post_002 = Post.objects.create(
             title = '두 번째 포스트입니다.',
             content = '1등이 전부는 아니잖아요?',
-            category = self.category_music,
+            Category = self.Category_music,
             author=self.user_obama,
         )
 
@@ -52,27 +52,27 @@ class TestView(TestCase) :
         )
 
          # 카테고리 페이지 테스트 코드
-        def test_category_page(self) :
-            response = self.client.get(self.category_programming.get_absolute_url())
+        def test_Category_page(self) :
+            response = self.client.get(self.Category_programming.get_absolute_url())
             self.assertEqual(response.status_code, 200)
 
             soup = BeautifulSoup(response.content, 'html.parser')
             self.navbar_test(soup)
-            self.category_card_test(soup)
+            self.Category_card_test(soup)
 
-            self.assertIn(self.category_programming.name, soup.h1.text)
+            self.assertIn(self.Category_programming.name, soup.h1.text)
 
             main_area = soup.find('div', id='main-area')
-            self.assertIn(self.category_programming.name, main_area.text)
+            self.assertIn(self.Category_programming.name, main_area.text)
             self.assertIn(self.post_001.title, main_area.text)
             self.assertNotIn(self.post_002.title, main_area.text)
             self.assertNotIn(self.post_003.title, main_area.text)
 
-        def category_card_test(self, soup) :
+        def Category_card_test(self, soup) :
             categories_card = soup.find('div', id='categories-card')
             self.assertIn('Categories', categories_card.text)
-            self.assertIn(f'{self.category_programming.name} ({self.category_programming.post_set.count()})', categories_card.text)
-            self.assertIn(f'{self.category_music.name} ({self.category_music.post_set.count()})', categories_card.text)
+            self.assertIn(f'{self.Category_programming.name} ({self.Category_programming.post_set.count()})', categories_card.text)
+            self.assertIn(f'{self.Category_music.name} ({self.Category_music.post_set.count()})', categories_card.text)
             self.assertIn(f'미분류 (1)1', categories_card.text)
 
 
@@ -103,14 +103,14 @@ class TestView(TestCase) :
             soup = BeautifulSoup(response.content, 'html.parser')
 
             self.navbar_test(soup)
-            self.category_card_test(soup)
+            self.Category_card_test(soup)
 
             main_area = soup.find('div', id='main-area')
             self.assertNotIn('아직 게시물이 없습니다', main_area.text)
 
             post_001_card = main_area.find('div', id='post-1')
             self.assertIn(self.post_001.title, post_001_card.text)
-            self.assertIn(self.post_001.category.name, post_001_card.text)
+            self.assertIn(self.post_001.Category.name, post_001_card.text)
             # post_list 태그
             self.assertIn(self.tag_hello.name, post_001_card.text)
             self.assertNotIn(self.tag_python.name, post_001_card.text)
@@ -118,7 +118,7 @@ class TestView(TestCase) :
 
             post_002_card = main_area.find('div', id='post-2')
             self.assertIn(self.post_002.title, post_002_card.text)
-            self.assertIn(self.post_002.category.name, post_002_card.text)
+            self.assertIn(self.post_002.Category.name, post_002_card.text)
             # post_list 태그
             self.assertNotIn(self.tag_hello.name, post_002_card.text)
             self.assertNotIn(self.tag_python.name, post_002_card.text)
@@ -159,7 +159,7 @@ class TestView(TestCase) :
             soup = BeautifulSoup(response.content, 'html.parser')
 
             self.navbar_test(soup)
-            self.category_card_test(soup)
+            self.Category_card_test(soup)
 
             # 2.3 첫 번째 포스트의 제목이 웹 브라우저 탭 타이틀에 들어 있다.
             self.assertIn(self.post_001.title, soup.title.text)
@@ -168,7 +168,7 @@ class TestView(TestCase) :
             main_area = soup.find('div', id='main-area')
             post_area = main_area.find('div', id='post-area')
             self.assertIn(self.post_001.title, post_area.text)
-            self.assertIn(self.category_programming.name, post_area.text)
+            self.assertIn(self.Category_programming.name, post_area.text)
 
             # 2.5 첫 번째 포스트의 작성자(author)가 포스트 영역에 있다(아직 구현할 수 없음).
             self.assertIn(self.user_trump.username.upper(), post_area)
@@ -192,7 +192,7 @@ class TestView(TestCase) :
             soup = BeautifulSoup(response.content, 'html.parser')
 
             self.navbar_test(soup)
-            self.category_card_test(soup)
+            self.Category_card_test(soup)
 
             self.assertIn(self.tag_hello.name, soup.h1.text)
 
@@ -282,7 +282,7 @@ class TestView(TestCase) :
             {
                 'title': '세 번째 포스트를 수정했습니다. ',
                 'content': '안녕 세계? 우리는 하나!',
-                'category': self.category_music.pk,
+                'category': self.Category_music.pk,
                 'tags_str': '파이썬 공부; 한글 태그, some tag',
             },
             follow=True
@@ -291,9 +291,56 @@ class TestView(TestCase) :
         main_area = soup.find('div', id='main-area')
         self.assertIn('세 번째 포스트를 수정했습니다.', main_area.text)
         self.assertIn('안녕 세계? 우리는 하나!', main_area.text)
-        self.assertIn(self.category_music.name, main_area.text)
+        self.assertIn(self.Category_music.name, main_area.text)
 
         self.assertIn('파이썬 공부', main_area.text)
         self.assertIn('한글 태그', main_area.text)
         self.assertIn('some tag', main_area.text)
         self.assertNotIn('python', main_area.text)
+      
+    def test_comment_form(self):
+      self.assertEqual(Comment.objects.count(), 1)
+      self.assertEqual(self.post_001.comment_set.count(), 1)
+
+      #로그인하지 않은 상태
+      response = self.client.get(self.post_001.get_absolute_url())
+      self.assertEqual(response.status_code, 200)
+      soup = BeautifulSoup(response.content, 'html.parser')
+
+      comment_area = soup.find('div', id='comment-area')
+      self.assertIn('Log in and leave a comment', comment_area.text)
+      self.assertFalse(comment_area.find('form', id='comment-form'))
+
+      #로그인한 상태
+      self.client.login(username='obama', password='somepassword')
+      response = self.client.get(self.post_001.get_absolute_url())
+      self.assertEqual(response.status_code, 200)
+      soup = BeautifulSoup(response.content, 'html.parser')
+
+      comment_area = soup.find('div', id='comment-area')
+      self.assertNotIn('Log in and leave a comment', comment_area.text)
+
+      comment_form = comment_area.find('form', id='comment-form')
+      self.assertTrue(comment_form.find('textarea', id='id_content'))
+      response = self.client.post(
+        self.post_001.get_absolute_url() + 'new_comment/',
+        {
+          'content' : "오바마으 댓글입니다.",
+        },
+        follow=True
+      )
+
+      self.assertEqual(response.status_code, 200)
+
+      self.assertEqual(Comment.objects.count(), 2)
+      self.assertEqual(self.post_001.comment_set.count(), 2)
+      
+      new_comment = Comment.objects.last()
+
+      soup = BeautifulSoup(response.content, 'html.parser')
+      self.assertIn(new_comment.post.title, soup.title.text)
+
+      comment_area = soup.find('div', id='comment-area')
+      new_comment_div = comment_area.find('div', id=f'comment-{new_comment.pk}')
+      self.assertIn('obama', new_comment_div.text)
+      self.assertIn('오바마의 댓글입니다.', new_comment_div.text)
