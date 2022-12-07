@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, CreateView,UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Category
+from .models import Post, Category, Tag, Comment
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 
@@ -14,16 +14,16 @@ class PostList(ListView):
     def get_context_data(self, **kwargs):
         context = super(PostList, self).get_context_data()
         context['categories'] = Category.objects.all()
-        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        context['no_category_post_count'] = Post.objects.filter(Category=None).count()
         return context
 
 class PostDetail(DetailView) :
     model = Post
 
     def get_context_data(self, **kwargs):
-        context = super(PostDetail,self).get_context_data()
+        context = super(PostDetail, self).get_context_data()
         context['categories'] = Category.objects.all()
-        context['no_category_post_count'] = Post.objects.filter(Category=None).count
+        context['no_category_post_count'] = Post.objects.filter(Category=None).count()
         return context
 
 class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
